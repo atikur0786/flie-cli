@@ -8,11 +8,32 @@ import (
 
 func main(){
 	lisCmd := flag.String("list", "", "Path to list all the files in the directory")
+	createCmd := flag.String("create", "", "Path to create a new file")
+	deleteCmd := flag.String("delete", "", "Path to delete a file")
+	readCmd := flag.String("read", "", "Path to read a file")
 
 	flag.Parse()
 
 	if *lisCmd != "" {
 		err := listFiles(*lisCmd)
+
+		if err != nil {
+			fmt.Println("Error: ", err)
+		}
+	} else if *createCmd != "" {
+		err := createFile(*createCmd)
+
+		if err != nil {
+			fmt.Println("Error: ", err)
+		}
+	} else if *deleteCmd != "" {
+		err := deleteFile(*deleteCmd)
+
+		if err != nil {
+			fmt.Println("Error: ", err)
+		}
+	} else if *readCmd != "" {
+		err := readFile(*readCmd) 
 
 		if err != nil {
 			fmt.Println("Error: ", err)
@@ -45,6 +66,52 @@ func listFiles(path string) error {
 	for _, file := range files{
 		fmt.Println(file)
 	}
+
+	return nil
+}
+
+// Function to create a new file
+func createFile(path string) error {
+	// Create teh file
+	file, err := os.Create(path);
+
+	if err != nil {
+		return fmt.Errorf("Error creating file: %v\n", err)
+	}
+
+	defer file.Close()
+
+	_, err = file.WriteString("This is a new file created by file cli\n")
+
+	if err != nil {
+		return fmt.Errorf("Error writing to file: %v\n", err)
+	}
+
+	return nil
+}
+
+// Function to delete a file
+func deleteFile(path string) error {
+	// Delete the file 
+	err := os.Remove(path)
+
+	if err != nil {
+		return fmt.Errorf("Error deleting file: %v\n", err)
+	}
+
+	return nil
+}
+
+// Function to read a file
+func readFile(path string) error {
+	// Read the file
+	file, err := os.ReadFile(path)
+
+	if err != nil {
+		return fmt.Errorf("Error reading file: %v\n", err)
+	}
+
+	fmt.Println(string(file))
 
 	return nil
 }
